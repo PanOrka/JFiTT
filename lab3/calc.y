@@ -25,18 +25,23 @@ input:
     | input line
 ;
 
-line: expr END 	{ printf("= %d\n", $$); }
+line: expr END 	{ printf("= %d\n", ($$ >= 0 ? $$ % MOD_G : MOD_G + ($$ % MOD_G))); }
     | error END	{ printf("Błąd składni!\n"); }
 ;
 
 expr: VAL
-    | expr ADD expr { $$ = add_mod($1, $3); }
-    | expr SUB expr { $$ = sub_mod($1, $3); }
-    | expr MUL expr { $$ = mul_mod($1, $3); }
-    | expr DIV expr { $$ = div_mod($1, $3); }
+    | expr ADD expr { $$ = add_mod($1 % MOD_G, $3 % MOD_G); }
+    | expr SUB expr { $$ = sub_mod($1 % MOD_G, $3 % MOD_G); }
+    | expr MUL expr { $$ = mul_mod($1 % MOD_G, $3 % MOD_G); }
+    | expr DIV expr { $$ = div_mod($1 % MOD_G, $3 % MOD_G); }
     | SUB expr %prec UNARY_MINUS { $$ = -$2; }
-    | VAL POW VAL { $$ = pow_mod($1, $3); }
+    | VAL POW _pow { $$ = pow_mod($1 % MOD_G, $3 % MOD_G); }
     | L_BRACE expr R_BRACE { $$ = $2; }
+;
+
+_pow: VAL
+    | SUB _pow %prec UNARY_MINUS { $$ = -$2; }
+    | L_BRACE _pow R_BRACE { $$ = $2; }
 ;
 %%
 
