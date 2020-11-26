@@ -3,17 +3,48 @@
 
 #include "mod_oper.h"
 
-stack *mem = NULL;
+node *mem = NULL;
+node *tail = NULL;
 
-bool write_stack(stack_element el, bool is_val) {
-    stack *new_stack = malloc(sizeof(stack));
+bool write_list(payload p, bool is_val) {
+    node *new_node = malloc(sizeof(node));
 
-    if (new_stack != NULL) {
-        new_stack->val = el;
-        new_stack->is_val = is_val;
-        new_stack->prev = mem;
+    if (new_node != NULL) {
+        new_node->val = p;
+        new_node->is_val = is_val;
+        new_node->next = NULL;
+        new_node->prev = tail;
 
-        mem = new_stack;
+        if (mem != NULL) {
+            tail->next = new_node;
+        } else {
+            mem = new_node;
+        }
+
+        tail = new_node;
+
+        return true;
+    }
+
+    return false;
+}
+
+bool write_list_first(payload p, bool is_val) {
+    node *new_node = malloc(sizeof(node));
+
+    if (new_node != NULL) {
+        new_node->val = p;
+        new_node->is_val = is_val;
+        new_node->next = mem;
+        new_node->prev = NULL;
+
+        if (mem != NULL) {
+            mem->prev = new_node;
+        } else {
+            tail = new_node;
+        }
+
+        mem = new_node;
 
         return true;
     }
@@ -24,8 +55,9 @@ bool write_stack(stack_element el, bool is_val) {
 int pop() {
     int ret_val = 0;
     if (mem != NULL) {
-        stack *to_free = mem;
-        mem = mem->prev;
+        node *to_free = tail;
+        tail = tail->prev;
+        tail->next = NULL;
 
         ret_val = to_free->val.val;
         free(to_free);
@@ -34,39 +66,23 @@ int pop() {
     return ret_val;
 }
 
-void clear_stack(stack *st) {
-    while (st != NULL) {
-        stack *to_free = st;
-        st = st->prev;
+void clear_list(bool print) {
+    while (mem != NULL) {
+        node *to_free = mem;
+        mem = mem->next;
 
-        if (to_free->is_val) {
-            printf("%d ", to_free->val.val);
-        } else {
-            printf("%c ", to_free->val.oper);
+        if (print) {
+            if (to_free->is_val) {
+                printf("%d ", to_free->val.val);
+            } else {
+                printf("%c ", to_free->val.oper);
+            }
         }
+
         free(to_free);
     }
 
     printf("\n");
-}
-
-void rebuild_stack(bool cleanup) {
-    stack *st = NULL;
-    while (mem != NULL) {
-        stack *to_swap = mem;
-        mem = mem->prev;
-
-        if (!cleanup) {
-            to_swap->prev = st;
-            st = to_swap;
-        } else {
-            free(to_swap);
-        }
-    }
-
-    if (!cleanup) {
-        clear_stack(st);
-    }
 }
 
 /**

@@ -10,18 +10,20 @@
 typedef union {
     int val;
     char oper;
-} stack_element;
+} payload;
 
-typedef struct stack stack;
+typedef struct node node;
 
-struct stack {
-    stack *prev;
-    stack_element val;
+struct node {
+    node *next;
+    node *prev;
+    payload val;
     bool is_val;
 };
 
-bool write_stack(stack_element el, bool is_val);
-void rebuild_stack(bool cleanup);
+bool write_list(payload el, bool is_val);
+bool write_list_first(payload p, bool is_val);
+void clear_list(bool print);
 void clear_mem();
 int pop();
 

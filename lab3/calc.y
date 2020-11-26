@@ -25,56 +25,71 @@ input:
 ;
 
 line: expr END {
-        rebuild_stack(false);
+        clear_list(true);
         printf("= \033[0;31m%d\033[0m\n\n", inv_addmod($$));
     }
     | error END	{
-        rebuild_stack(true);
+        clear_list(false);
         printf("Błąd składni!\n");
     }
 ;
 
 expr: VAL {
-        write_stack((stack_element){ .val = $1 % MOD_G }, true);
+        write_list((payload){ .val = $1 % MOD_G }, true);
     }
     | expr ADD expr {
         $$ = add_mod($1 % MOD_G, $3 % MOD_G);
-        write_stack((stack_element){ .oper = '+' }, false);
+        write_list((payload){ .oper = '+' }, false);
     }
     | expr SUB expr {
         $$ = sub_mod($1 % MOD_G, $3 % MOD_G);
-        write_stack((stack_element){ .oper = '-' }, false);
+        write_list((payload){ .oper = '-' }, false);
     }
     | expr MUL expr {
         $$ = mul_mod($1 % MOD_G, $3 % MOD_G);
-        write_stack((stack_element){ .oper = '*' }, false);
+        write_list((payload){ .oper = '*' }, false);
     }
     | expr DIV expr {
         $$ = div_mod($1 % MOD_G, $3 % MOD_G);
-        write_stack((stack_element){ .oper = '/' }, false);
+        write_list((payload){ .oper = '/' }, false);
     }
-    | SUB expr %prec UNARY_MINUS {
+    | SUB _umin %prec UNARY_MINUS {
         $$ = -$2;
     }
-    | VAL POW _pow {
-        int top = pop();
-        write_stack((stack_element){ .val = $1 }, true);
-        write_stack((stack_element){ .val = top }, true);
+    | _powl POW _powr {
         $$ = pow_mod($1 % MOD_G, $3 % MOD_G);
-        write_stack((stack_element){ .oper = '^' }, false);
+        write_list((payload){ .oper = '^' }, false);
     }
     | L_BRACE expr R_BRACE {
         $$ = $2;
     }
 ;
 
-_pow: VAL {
-        write_stack((stack_element){ .val = $1 % MOD_G }, true);
+_umin: VAL {
+        write_list((payload){ .val = inv_addmod(-$1) }, true);
     }
-    | SUB _pow %prec UNARY_MINUS {
+    | L_BRACE expr R_BRACE {
+        $$ = $2;
+    }
+;
+
+_powr: VAL {
+        write_list((payload){ .val = $1 % MOD_G }, true);
+    }
+    | SUB _powr %prec UNARY_MINUS {
         $$ = -$2;
+        int top = pop();
+        write_list((payload){ .val = inv_addmod(-top) }, true);
     }
-    | L_BRACE _pow R_BRACE { $$ = $2; }
+    | L_BRACE _powr R_BRACE { $$ = $2; }
+;
+
+_powl: VAL {
+        write_list_first((payload){ .val = $1 % MOD_G }, true);
+    }
+    | L_BRACE expr R_BRACE {
+        $$ = $2;
+    }
 ;
 %%
 
