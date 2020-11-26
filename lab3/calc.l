@@ -79,7 +79,6 @@ int yylex();
 
     [\\][\n] {
         printf("\033[0;31m%s\033[0m", yytext);
-        BEGIN(COMMENT);
     }
 
     . {

@@ -6,7 +6,6 @@
 
 int yylex();
 int yyerror(char*);
-
 %}
 
 %token VAL
@@ -25,23 +24,56 @@ input:
     | input line
 ;
 
-line: expr { printf("\n= \033[0;31m%d\033[0m\n\n", ($$ >= 0 ? $$ % MOD_G : MOD_G + ($$ % MOD_G))); }
-    | expr END 	{ printf("= \033[0;31m%d\033[0m\n\n", ($$ >= 0 ? $$ % MOD_G : MOD_G + ($$ % MOD_G))); }
-    | error END	{ printf("Błąd składni!\n"); }
+line: expr END {
+        rebuild_stack(false);
+        printf("= \033[0;31m%d\033[0m\n\n", inv_addmod($$));
+    }
+    | error END	{
+        rebuild_stack(true);
+        printf("Błąd składni!\n");
+    }
 ;
 
-expr: VAL
-    | expr ADD expr { $$ = add_mod($1 % MOD_G, $3 % MOD_G); }
-    | expr SUB expr { $$ = sub_mod($1 % MOD_G, $3 % MOD_G); }
-    | expr MUL expr { $$ = mul_mod($1 % MOD_G, $3 % MOD_G); }
-    | expr DIV expr { $$ = div_mod($1 % MOD_G, $3 % MOD_G); }
-    | SUB expr %prec UNARY_MINUS { $$ = -$2; }
-    | VAL POW _pow { $$ = pow_mod($1 % MOD_G, $3 % MOD_G); }
-    | L_BRACE expr R_BRACE { $$ = $2; }
+expr: VAL {
+        write_stack((stack_element){ .val = $1 % MOD_G }, true);
+    }
+    | expr ADD expr {
+        $$ = add_mod($1 % MOD_G, $3 % MOD_G);
+        write_stack((stack_element){ .oper = '+' }, false);
+    }
+    | expr SUB expr {
+        $$ = sub_mod($1 % MOD_G, $3 % MOD_G);
+        write_stack((stack_element){ .oper = '-' }, false);
+    }
+    | expr MUL expr {
+        $$ = mul_mod($1 % MOD_G, $3 % MOD_G);
+        write_stack((stack_element){ .oper = '*' }, false);
+    }
+    | expr DIV expr {
+        $$ = div_mod($1 % MOD_G, $3 % MOD_G);
+        write_stack((stack_element){ .oper = '/' }, false);
+    }
+    | SUB expr %prec UNARY_MINUS {
+        $$ = -$2;
+    }
+    | VAL POW _pow {
+        int top = pop();
+        write_stack((stack_element){ .val = $1 }, true);
+        write_stack((stack_element){ .val = top }, true);
+        $$ = pow_mod($1 % MOD_G, $3 % MOD_G);
+        write_stack((stack_element){ .oper = '^' }, false);
+    }
+    | L_BRACE expr R_BRACE {
+        $$ = $2;
+    }
 ;
 
-_pow: VAL
-    | SUB _pow %prec UNARY_MINUS { $$ = -$2; }
+_pow: VAL {
+        write_stack((stack_element){ .val = $1 % MOD_G }, true);
+    }
+    | SUB _pow %prec UNARY_MINUS {
+        $$ = -$2;
+    }
     | L_BRACE _pow R_BRACE { $$ = $2; }
 ;
 %%
