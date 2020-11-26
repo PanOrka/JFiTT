@@ -6,47 +6,84 @@
 int yylex();
 %}
 
+%s COMMENT
+
 %%
-[ \t]+ ;
+<INITIAL>{
+    [#] {
+        printf("\033[0;31m%s\033[0m", yytext);
+        BEGIN(COMMENT);
+    }
 
-[0-9]+ {
-    yylval = atoi(yytext);
-    return VAL;
+    [ \t]+ {
+        printf("\033[0;31m%s\033[0m", yytext);
+    }
+
+    [0-9]+ {
+        printf("\033[0;31m%s\033[0m", yytext);
+        yylval = atoi(yytext);
+        return VAL;
+    }
+
+    [+] {
+        printf("\033[0;31m%s\033[0m", yytext);
+        return ADD;
+    }
+
+    [-] {
+        printf("\033[0;31m%s\033[0m", yytext);
+        return SUB;
+    }
+
+    [*] {
+        printf("\033[0;31m%s\033[0m", yytext);
+        return MUL;
+    }
+
+    [/] {
+        printf("\033[0;31m%s\033[0m", yytext);
+        return DIV;
+    }
+
+    [\(] {
+        printf("\033[0;31m%s\033[0m", yytext);
+        return L_BRACE;
+    }
+
+    [\)] {
+        printf("\033[0;31m%s\033[0m", yytext);
+        return R_BRACE;
+    }
+
+    [\^] {
+        printf("\033[0;31m%s\033[0m", yytext);
+        return POW;
+    }
+
+    \n {
+        printf("\033[0;31m%s\033[0m", yytext);
+        return END;
+    }
+
+    . {
+        printf("\033[0;31m%s\033[0m", yytext);
+        return ERROR;
+    }
 }
 
-[+] {
-    return ADD;
-}
+<COMMENT>{
+    [\n] {
+        printf("\033[0;31m%s\033[0m", yytext);
+        BEGIN(INITIAL);
+    }
 
-[-] {
-    return SUB;
-}
+    [\\][\n] {
+        printf("\033[0;31m%s\033[0m", yytext);
+        BEGIN(COMMENT);
+    }
 
-[*] {
-    return MUL;
-}
-
-[/] {
-    return DIV;
-}
-
-[\(] {
-    return L_BRACE;
-}
-
-[\)] {
-    return R_BRACE;
-}
-
-[\^] {
-    return POW;
-}
-
-\n {
-    return END;
-}
-
-. {
-    return ERROR;
+    . {
+        printf("\033[0;31m%s\033[0m", yytext);
+    }
 }
 %%

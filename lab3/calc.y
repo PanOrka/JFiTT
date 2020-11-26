@@ -25,7 +25,8 @@ input:
     | input line
 ;
 
-line: expr END 	{ printf("= %d\n", ($$ >= 0 ? $$ % MOD_G : MOD_G + ($$ % MOD_G))); }
+line: expr { printf("\n= \033[0;31m%d\033[0m\n\n", ($$ >= 0 ? $$ % MOD_G : MOD_G + ($$ % MOD_G))); }
+    | expr END 	{ printf("= \033[0;31m%d\033[0m\n\n", ($$ >= 0 ? $$ % MOD_G : MOD_G + ($$ % MOD_G))); }
     | error END	{ printf("Błąd składni!\n"); }
 ;
 
