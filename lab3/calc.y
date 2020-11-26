@@ -70,6 +70,7 @@ _umin: VAL {
     }
     | L_BRACE expr R_BRACE {
         $$ = $2;
+        write_list((payload){ .oper = 'n' }, false);
     }
 ;
 
