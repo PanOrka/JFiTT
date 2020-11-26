@@ -54,6 +54,10 @@ bool docs = false;
         printf("%s", yytext);
     }
 
+    [\\][\\] {
+        printf("%s", yytext);
+    }
+
     ["] {
         printf("%s", yytext);
         BEGIN(INITIAL);

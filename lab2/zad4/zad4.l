@@ -73,6 +73,11 @@ int mul(int a, int b) {
 }
 
 int divide(int a, int b) {
+    if (b == 0) {
+        printf("\nERROR: division by 0!\n");
+        exit(EXIT_FAILURE);
+    }
+
     return a / b;
 }
 

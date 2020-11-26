@@ -57,13 +57,22 @@ int yylex();
         printf("%s", yytext);
     }
 
+    [\\][\\] {
+        printf("%s", yytext);
+    }
+
     ['] {
-       printf("%s", yytext); 
+       printf("%s", yytext);
+       BEGIN(INITIAL);
     }
 }
 
 <STRING_B>{
     \\["] {
+        printf("%s", yytext);
+    }
+
+    [\\][\\] {
         printf("%s", yytext);
     }
 

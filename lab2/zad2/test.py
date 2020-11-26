@@ -20,3 +20,6 @@ def main():
 
 if __name__ == "main":
     main()
+
+
+" parzysta # \\\"  #nieparzysta liczba backslashy \\" # a tu parzysta hahaha

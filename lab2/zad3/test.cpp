@@ -53,3 +53,8 @@ int main()
  cout << /*Proba*/"Zabawa \" // ala i kot " << endl;	   
  printf("Zabawa \" // ala i kot ");
 }
+
+
+
+
+" parzysta # \\\"  #nieparzysta liczba backslashy \\"
