@@ -35,7 +35,7 @@ line: expr END {
 ;
 
 expr: VAL {
-        write_list((payload){ .val = $1 % MOD_G }, true);
+        write_list((payload){ .val = inv_addmod($1) }, true);
     }
     | expr ADD expr {
         $$ = add_mod($1 % MOD_G, $3 % MOD_G);
@@ -75,7 +75,7 @@ _umin: VAL {
 ;
 
 _powr: VAL {
-        write_list((payload){ .val = $1 % MOD_G }, true);
+        write_list((payload){ .val = inv_addmod($1) }, true);
     }
     | SUB _powr %prec UNARY_MINUS {
         $$ = -$2;
@@ -86,7 +86,7 @@ _powr: VAL {
 ;
 
 _powl: VAL {
-        write_list_first((payload){ .val = $1 % MOD_G }, true);
+        write_list_first((payload){ .val = inv_addmod($1) }, true);
     }
     | L_BRACE expr R_BRACE {
         $$ = $2;
