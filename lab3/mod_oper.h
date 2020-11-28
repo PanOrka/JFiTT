@@ -25,7 +25,7 @@ bool write_list(payload el, bool is_val);
 void clear_list(bool print);
 int pop();
 
-int inv_addmod(int a);
+int inv_addmod(int a, int mod);
 
 int add_mod(int a, int b);
 

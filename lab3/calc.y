@@ -26,7 +26,7 @@ input:
 
 line: expr END {
         clear_list(true);
-        printf("= \033[0;31m%d\033[0m\n\n", inv_addmod($$));
+        printf("= \033[0;31m%d\033[0m\n\n", inv_addmod($$, MOD_G));
     }
     | error END	{
         clear_list(false);
@@ -35,7 +35,7 @@ line: expr END {
 ;
 
 expr: VAL {
-        write_list((payload){ .val = inv_addmod($1) }, true);
+        write_list((payload){ .val = inv_addmod($1, MOD_G) }, true);
     }
     | expr ADD expr {
         $$ = add_mod($1 % MOD_G, $3 % MOD_G);
@@ -66,7 +66,7 @@ expr: VAL {
 ;
 
 _umin: VAL {
-        write_list((payload){ .val = inv_addmod(-$1) }, true);
+        write_list((payload){ .val = inv_addmod(-$1, MOD_G) }, true);
     }
     | L_BRACE expr R_BRACE {
         $$ = $2;
@@ -75,18 +75,18 @@ _umin: VAL {
 ;
 
 _powr: VAL {
-        write_list((payload){ .val = inv_addmod($1) }, true);
+        write_list((payload){ .val = inv_addmod($1, MOD_G - 1) }, true);
     }
     | SUB _powr %prec UNARY_MINUS {
         $$ = -$2;
         int top = pop();
-        write_list((payload){ .val = inv_addmod(-top) }, true);
+        write_list((payload){ .val = inv_addmod(-top, MOD_G - 1) }, true);
     }
     | L_BRACE _powr R_BRACE { $$ = $2; }
 ;
 
 _powl: VAL {
-        write_list((payload){ .val = inv_addmod($1) }, true);
+        write_list((payload){ .val = inv_addmod($1, MOD_G) }, true);
     }
     | L_BRACE expr R_BRACE {
         $$ = $2;

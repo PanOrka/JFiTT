@@ -34,10 +34,10 @@ int pop() {
     if (mem != NULL) {
         node *to_free = tail;
         tail = tail->prev;
-        if (tail == NULL) {
-            mem = NULL;
-        } else {
+        if (tail != NULL) {
             tail->next = NULL;
+        } else {
+            mem = NULL;
         }
 
         ret_val = to_free->val.val;
@@ -84,8 +84,8 @@ int inv_mulmod(int a) {
     return x / b;
 }
 
-inline int inv_addmod(int a) {
-    return a >= 0 ? a % MOD_G : MOD_G + (a % MOD_G);
+inline int inv_addmod(int a, int mod) {
+    return a >= 0 ? a % mod : mod + (a % mod);
 }
 
 int add_mod(int a, int b) {
