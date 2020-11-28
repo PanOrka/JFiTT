@@ -86,7 +86,7 @@ _powr: VAL {
 ;
 
 _powl: VAL {
-        write_list_first((payload){ .val = inv_addmod($1) }, true);
+        write_list((payload){ .val = inv_addmod($1) }, true);
     }
     | L_BRACE expr R_BRACE {
         $$ = $2;

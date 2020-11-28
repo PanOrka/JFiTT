@@ -22,12 +22,9 @@ struct node {
 };
 
 bool write_list(payload el, bool is_val);
-bool write_list_first(payload p, bool is_val);
 void clear_list(bool print);
-void clear_mem();
 int pop();
 
-int inv_mulmod(int a);
 int inv_addmod(int a);
 
 int add_mod(int a, int b);

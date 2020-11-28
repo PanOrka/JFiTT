@@ -29,35 +29,16 @@ bool write_list(payload p, bool is_val) {
     return false;
 }
 
-bool write_list_first(payload p, bool is_val) {
-    node *new_node = malloc(sizeof(node));
-
-    if (new_node != NULL) {
-        new_node->val = p;
-        new_node->is_val = is_val;
-        new_node->next = mem;
-        new_node->prev = NULL;
-
-        if (mem != NULL) {
-            mem->prev = new_node;
-        } else {
-            tail = new_node;
-        }
-
-        mem = new_node;
-
-        return true;
-    }
-
-    return false;
-}
-
 int pop() {
     int ret_val = 0;
     if (mem != NULL) {
         node *to_free = tail;
         tail = tail->prev;
-        tail->next = NULL;
+        if (tail == NULL) {
+            mem = NULL;
+        } else {
+            tail->next = NULL;
+        }
 
         ret_val = to_free->val.val;
         free(to_free);
@@ -81,6 +62,7 @@ void clear_list(bool print) {
 
         free(to_free);
     }
+    tail = NULL;
 
     printf("\n");
 }
