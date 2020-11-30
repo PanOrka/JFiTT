@@ -18,13 +18,15 @@ int yyerror(char*);
 
 %token END
 %token ERROR
+%token EMPTY
 
 %%
 input:
     | input line
 ;
 
-line: expr END {
+line: EMPTY
+    | expr END {
         clear_list(true);
         printf("= \033[0;31m%d\033[0m\n\n", inv_addmod($$, MOD_G));
     }

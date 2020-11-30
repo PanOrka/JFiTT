@@ -1,9 +1,12 @@
 %option noyywrap
 
 %{
+#include <stdint.h>
+
 #include "calc_y.h"
 
 int yylex();
+uint8_t any_symbol = 0;
 %}
 
 %s COMMENT
@@ -20,52 +23,66 @@ int yylex();
     }
 
     [0-9]+ {
+        any_symbol = 1;
         printf("\033[0;31m%s\033[0m", yytext);
         yylval = atoi(yytext);
         return VAL;
     }
 
     [+] {
+        any_symbol = 1;
         printf("\033[0;31m%s\033[0m", yytext);
         return ADD;
     }
 
     [-] {
+        any_symbol = 1;
         printf("\033[0;31m%s\033[0m", yytext);
         return SUB;
     }
 
     [*] {
+        any_symbol = 1;
         printf("\033[0;31m%s\033[0m", yytext);
         return MUL;
     }
 
     [/] {
+        any_symbol = 1;
         printf("\033[0;31m%s\033[0m", yytext);
         return DIV;
     }
 
     [\(] {
+        any_symbol = 1;
         printf("\033[0;31m%s\033[0m", yytext);
         return L_BRACE;
     }
 
     [\)] {
+        any_symbol = 1;
         printf("\033[0;31m%s\033[0m", yytext);
         return R_BRACE;
     }
 
     [\^] {
+        any_symbol = 1;
         printf("\033[0;31m%s\033[0m", yytext);
         return POW;
     }
 
-    \n {
-        printf("\033[0;31m%s\033[0m", yytext);
-        return END;
+    [\n]+ {
+        if (any_symbol) {
+            any_symbol = 0;
+            printf("\033[0;31m%s\033[0m", yytext);
+            return END;
+        }
+
+        return EMPTY;
     }
 
     . {
+        any_symbol = 0;
         printf("\033[0;31m%s\033[0m", yytext);
         return ERROR;
     }
@@ -73,12 +90,16 @@ int yylex();
 
 <COMMENT>{
     [\n] {
-        printf("\033[0;31m%s\033[0m", yytext);
+        printf("\n");
         BEGIN(INITIAL);
+        if (any_symbol) {
+            any_symbol = 0;
+            return END;
+        }
     }
 
     [\\][\n] {
-        printf("\033[0;31m%s\033[0m", yytext);
+        printf("\033[0;31m\\\n\033[0m");
     }
 
     . {

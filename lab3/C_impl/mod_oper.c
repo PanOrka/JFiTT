@@ -64,7 +64,9 @@ void clear_list(bool print) {
     }
     tail = NULL;
 
-    printf("\n");
+    if (print) {
+        printf("\n");
+    }
 }
 
 /**
